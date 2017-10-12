@@ -65,8 +65,10 @@ watch.data('b.e[2][0]', 555);
 
 ## API   
 ### watch.setData(obj)   
-等价于原生小程序`this.setData`，会改变数据并更新视图，也会触发回调（假如有配置）
-**示例：**
+等价于原生小程序`this.setData`，会改变数据并更新视图，也会触发回调（假如有配置）  
+
+**示例：**   
+
 ```javascript
 watch.setData({
 	a: 2,
@@ -83,15 +85,17 @@ watch.setData({
 // })
 ```
 ### watch.data(key, val)   
-等价于原生小程序`this.data.a = 3`，之后改变数据不更新视图，也会触发回调（假如有配置）
-**示例：**
+等价于原生小程序`this.data.a = 3`，之后改变数据不更新视图，也会触发回调（假如有配置）  
+
+**示例：**  
 ```javascript
 watch.data('b.e[2][0]', 555);
 //等价于this.b.e[2][0] = 555
 ```
 ### watch.getter(data, path)   
-能根据提供的路径深度获取数据
-**示例：**
+能根据提供的路径深度获取数据  
+
+**示例：**  
 ```javascript
 watch.get({
         a: '1',
@@ -106,8 +110,9 @@ watch.get({
 ```
 
 ### watch.unSubscribe(key)   
-删除观察者，改变数据不触发回调
-**示例：**
+删除观察者，改变数据不触发回调  
+
+**示例：**  
 ```javascript
 watch.unSubscribe('b.e[2][0]');
 ```

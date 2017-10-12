@@ -1,0 +1,7 @@
+<!--index.wxml-->
+<view class="container">
+  <view>a={{a}}</view>	
+  <view>b.c.d={{b.c.d}}</view>
+  <view>b.e[2][0]={{b.e[2][0]}}</view>
+  <view>c={{c}}</view>
+</view>

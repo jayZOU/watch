@@ -1,0 +1,26 @@
+{
+  "name": "watch",
+  "version": "0.0.1",
+  "description": "提供小程序一种更通用的方式来观察和响应data实例上的数据变动",
+  "main": "watch.js",
+  "scripts": {
+    "test": "mocha --require babel-polyfill --compilers js:babel-register"
+  },
+  "keywords": [
+    "watch",
+    "weapp"
+  ],
+  "author": "jayzou",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.23.0",
+    "babel-core": "^6.0.0",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-es2015": "^6.0.0",
+    "babel-preset-stage-2": "^6.0.0",
+    "babel-register": "^6.23.0",
+    "babel-runtime": "^6.0.0",
+    "chai": "^4.1.2",
+    "mocha": "^4.0.1"
+  }
+}

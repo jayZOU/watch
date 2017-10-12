@@ -1,6 +1,6 @@
 # watch   
 
-![enter image description here](https://api.travis-ci.org/jayZOU/watch.svg?branch=master)  
+<a href="https://travis-ci.org/jayZOU/watch/builds/286933612"><img src="https://api.travis-ci.org/jayZOU/watch.svg?branch=master" alt="Build Status"></a>
 
 小程序不提供类似于vue一样监听数据([vm.watch](https://cn.vuejs.org/v2/guide/computed.html#%E8%AE%A1%E7%AE%97%E5%B1%9E%E6%80%A7-vs-%E8%A2%AB%E8%A7%82%E5%AF%9F%E7%9A%84%E5%B1%9E%E6%80%A7))，当数据改变时触发回调检测改变数据类型是否符合要求。
 ![enter image description here](https://sfault-image.b0.upaiyun.com/270/694/2706941227-59df1b4702528_articlex)

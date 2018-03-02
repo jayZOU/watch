@@ -34,12 +34,10 @@ class Watch{
 	**/
 	setData(obj){
 		const that = this;
+		const oldData = Object.assign({}, this.page.data);
 		this.page.setData(obj);
 		Object.keys(obj).forEach((key) => {
-			that.notify(key, that.page, obj[key], that.getter(that.page.data, key))
-			// if(that.observers.has(key)){
-			// 	that.observers.get(key).apply(that.page, [obj[key], that.getter(that.page.data, key)]);
-			// }
+			that.notify(key, that.page, obj[key], that.getter(oldData, key))
 		})
 	}
 

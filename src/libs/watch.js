@@ -1,134 +1,105 @@
-
-class Watch{
-	constructor(context){
-		this.page = context;
-
-		this.observers = new Map();		//观察者队列
-
-		this.init();				//将watch数据写入观察者队列
+class Watch {
+	constructor (context) {
+		this.page = context
+		this.observers = new Map()
+		this.init()
 	}
 
-	/**
-	**	初始化观察队列，将已订阅的
-	**/
-	init(){
-		const that = this;
-		Object.keys(this.page.watch).forEach((key) => {
-			if(that.isSet(that.page.data, key)){
-				that.subscribe(key, that.page.watch[key]);
+	// 将 watch 数据写入观察者队列
+	init() {
+		const ctx = this.page
+
+		Object.keys(ctx.watch).forEach(path => {
+			if (this.inData(path)) {
+				this.observers.set(path, ctx.watch[path])
 			}
 		})
 	}
 
-	/**
-	**	只改变数据，不更新视图
-	**/
-	data(key, val){
-		if(this.isSet(this.page.data, key)){
-			this.setter(key, val);
+	// 更新值并触发回调 不更新视图
+	data(path, newVal) {
+		if (this.inData(path)) {
+			this.setter(this.page.data, path, newVal)
 		}
 	}
 
-	/**
-	**	模拟小程序原生setData方法，改变更新视图前推送订阅事件
-	**/
-	setData(obj){
-		const that = this;
-		const oldData = Object.assign({}, this.page.data);
-		this.page.setData(obj);
-		Object.keys(obj).forEach((key) => {
-			that.notify(key, that.page, obj[key], that.getter(oldData, key))
+	// 更新值并触发回调 并更新视图
+	setData(obj) {
+		const oldData = Object.assign({}, this.page.data)
+
+		this.page.setData(obj)
+		Object.keys(obj).forEach(path => {
+			if (this.observers.has(path)) {
+				this.notify(path, obj[path], this.getter(oldData, path))
+			}
 		})
 	}
 
+	// 触发key的对应回调
+	notify(key, newVal, oldVal) {
+		if (!this.observers.has(key)) return
+		this.observers.get(key).call(this.page, newVal, oldVal)
+	}
+
+	// 删除观察者
+	unSubscribe(key) {
+		this.observers.delete(key)
+	}
+
 	/**
-	**	发布订阅事件
-	**/
-	notify(key, ctx, val, oldVal) {
-		if(this.observers.has(key)){
-			this.observers.get(key).apply(ctx, [val, oldVal]);
+	 * 根据路径设置 data 值
+	 * @param {string} path 
+	 * @param {any} newVal 
+	 */
+	setter(data, path, newVal) {
+		if (!this.inData(path)) return
+
+		let oldVal
+
+		const REG_KEY = /\[((?:\S+?))\]|\./g
+		const pathArr = path.toString().split(REG_KEY).filter(item => !!item)
+		return pathArr.reduce((res, currentPath, currentIndex) => {
+			// assign the new value to the key
+			if (currentIndex === pathArr.length - 1) {
+				oldVal = res[currentPath]
+				res[currentPath] = newVal
+			}
+
+			return res[currentPath]
+		}, data)
+
+		if (this.observers.has(path)) {
+			this.notify(path, newVal, oldVal)
 		}
 	}
 
 	/**
-	**	获取所有的观察者对象
-	**/
-	getObs() {
-		return this.observers;
-	}
+	 * getter 根据路径获取对应 key 的 value
+	 * 
+	 * @param {object} data data 对象
+	 * @param {string} path data 对象下的某一键值对的索引
+	 * @return {any} keyValue
+	 * 
+	 * e.g.
+	 * var data = {"a":{"b":{"c":{"d":123}}}}
+	 * getter(data, 'a.b[c]') // return {"d":123}
+	 */
+	getter(data, path) {
+		const REG_KEY = /\[((?:\S+?))\]|\./g
+		const pathArr = path.toString().split(REG_KEY).filter(item => !!item)
 
-	/**
-	**	添加观察者
-	**/
-	subscribe(key, cb){
-		if(this.observers.has(key)) this.observers.delete(key);
-		this.observers.set(key, cb);
-
-	}
-
-	/**
-	**	删除观察者
-	**/
-	unSubscribe(key){
-		if(this.observers.has(key)) this.observers.delete(key);
-	}
-
-	/**
-	**	根据路径设置data值
-	**/
-	setter(path, val) {
-		if(!path || !this.isSet(this.page.data, path)) return undefined;
-		const REG_KEY = /\[(['"a-zA-Z0-9]*)\]|\./gi;
-        const pathArr = path.split(REG_KEY).filter(item => !!item);
-        let depDataNote = [];
-        let oldVal;
-
-        pathArr.reduce((result, currentPath, currentIndex) => {
-        	if(currentIndex === pathArr.length - 1){
-        		oldVal = result[currentPath];
-        		result[currentPath] = val
-        	}
-        	depDataNote.push({
-        		key: currentPath,
-        		value: result[currentPath]
-        	})
-			return result[currentPath];
-		}, this.page.data)
-
-        this.page.data[pathArr[0]] = depDataNote[0].value;
-
-        this.notify(path, this.page, val, oldVal);
-
-        // console.log(this.path.data);
-
-        return oldVal === undefined ? undefined : val;
-	}
-
-	/**
-	**	根据路径获取data值
-	**/
-    getter(data, path) {
-  		const REG_KEY = /\[(['"a-zA-Z0-9]*)\]|\./gi;
-		const pathArr = path.split(REG_KEY).filter(item => !!item);
-
-		const result = pathArr.reduce((result, currentPath, currentIndex) => {
-			const currentValueType = Object.prototype.toString.call(result);
-			return /String|Number|Boolean|Null|Undefined/.test(currentValueType) ? undefined : result[currentPath]
+		return pathArr.reduce((res, currentPath) => {
+			const currentValueType = Object.prototype.toString.call(res)
+			return /String|Number|Boolean|Null|Undefined/.test(currentValueType)
+				? undefined
+				: res[currentPath]
 		}, data)
+	}
 
-
-
-		return result;
-  
-    }
-
-
-    /**
-	**	检查target[key]是否存在
-    **/
-    isSet(target, key) {
-    	return this.getter(target, key) !== undefined ? true : false;
-    }
+	// check if data.path exist
+	inData(path) {
+		return this.getter(this.page.data, path) !== undefined ? true : false
+	}
 }
 
-export default Watch;
+export default Watch

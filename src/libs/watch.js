@@ -56,7 +56,7 @@ class Watch {
 
     let oldVal
     const pathArr = this._getPathArr(path)
-    return pathArr.reduce((res, currentPath, currentIndex) => {
+    let res = pathArr.reduce((res, currentPath, currentIndex) => {
       // assign the new value to the key
       if (currentIndex === pathArr.length - 1) {
         oldVal = res[currentPath]
@@ -69,6 +69,8 @@ class Watch {
     if (this.observers.has(path)) {
       this.notify(path, newVal, oldVal)
     }
+
+    return res
   }
 
   /**

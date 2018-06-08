@@ -94,7 +94,7 @@ class Watch {
 
   // check if data.path exist
   inData(path) {
-    return this.getter(this.page.data, path) !== undefined ? true : false
+    return this.getter(this.page.data, path) !== undefined
   }
 
   _getPathArr(path) {
